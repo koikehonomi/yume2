@@ -1,0 +1,22 @@
+databases:
+  - name: 65-yume_DB
+    databaseName: 65-yume_db
+    user: 65-yume
+    region: singapore
+
+services:
+  - type: web
+    name: 65-yume
+    env: ruby
+    region: singapore
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: 65-yume_DB
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+
