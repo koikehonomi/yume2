@@ -1,0 +1,137 @@
+<h1>ブライトリビングー暮らしと共にー</h1>
+<h3>一覧ページ</h3>
+<h3>投稿を検索</h3>
+ <%= form_tag({controller:"dogs",action:"index"}, method: :get) do %>
+   <%= text_field_tag :search %>
+   <%= submit_tag '検索する'  %>
+<% end %>
+<%= link_to "ログイン", dogs_path %>
+<%= link_to "新規登録", new_user_registration_path %>
+<%= button_to 'ログアウト', destroy_user_session_path, method: :delete %> 
+<%= link_to "新規投稿へ", new_dog_path %>
+<div class="dogs-container">
+
+<% if user_signed_in? %>
+  <%= link_to "マイページへ", user_path(current_user.id) %>
+<% end %>
+
+<%= form_tag({controller:"dogs",action:"index"}, method: :get) do %>
+  <% Tag.all.each do |t| %>
+      <li><%= check_box :tag_ids, t.name %><%= t.name %></li>
+  <% end %>
+  <%= submit_tag '検索' %>
+<% end %>
+
+<%= form_tag({controller:"dogs",action:"index"}, method: :get) do %>
+  <%= text_field_tag :tag %>
+  <%= submit_tag 'タグを追加' %>
+<% end %>
+
+  <% @dogs.each do |t| %>
+    <div class="dog">
+
+    <%= image_tag t.image_url, size: "250x200" if t.image? %>
+
+    <% if t.youtube_url.present? %>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/<%= find_youtube_url(t.youtube_url) %>" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <% end %>
+
+
+    <%= t.user.email %>
+      <%= t.body %>
+
+      <% if user_signed_in? %>
+      <% if current_user.already_liked?(t) %>
+          <%= link_to dog_like_path(id: t.id, dog_id: t.id), method: :delete do %>
+            <i class="fas fa-heart"></i><%= t.likes.count %>   
+          <% end %>
+      <% else %>
+          <%= link_to dog_likes_path(id: t.id, dog_id: t.id), method: :post do %>
+            <i class="far fa-heart"></i><%= t.likes.count %>
+          <% end %>
+      <% end %>
+ <% else %>
+   <i class="far fa-heart"></i><%= t.likes.count %>
+  <% end %>
+
+      <%= t.created_at %>
+      <%= link_to "詳細へ", dog_path(t.id) %> 
+
+      <% if user_signed_in? && current_user.id == t.user_id %>
+       <%= link_to "編集する", edit_dog_path(t.id) %>
+       <%= button_to "削除する", dog_path(t.id), method: :delete %>
+      <% end %> 
+
+      
+
+
+    </div>
+  <% end %>
+</div>
+<h1>Blogs#index</h1>
+<p>Find me in app/views/blogs/index.html.erb</p>
+
+<p id="notice"><%= notice %></p>
+
+<h1>自分の日記</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>タイトル</th>
+      <th>時間</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @blogs.each do |blog| %>
+      <tr>
+        <td><%= blog.title %></td>
+        <td><%= blog.start_time.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= link_to 'Show', blog %></td>
+        <td><%= link_to 'Edit', edit_blog_path(blog.id) %></td>
+        <td><%= link_to 'Destroy',blog_path(blog.id), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to '日記をかく', new_blog_path %>
+
+<%= month_calendar events: @blogs do |date, blogs| %>
+  <%= date.day %>
+
+  <% blogs.each do |blog| %>
+    <div>
+      <%= link_to blog.title, blog %>
+    </div>
+  <% end %>
+<% end %>
+
+<!DOCTYPE html> <!--　この文章がHTML文章であることを伝える要素です。-->
+<html lang="ja"><!--言語の指定-->
+    <head><!--ページに表示されない情報(サイトの裏側の設定)-->
+        <meta charset="utf-8">
+        <title>香水診断スタート</title><!--ブラウザのタブのタイトルを指定-->
+    </head>
+
+    <body>
+        <header>
+            <h1 class="headline">
+            <a>Perfu_me</a>
+            </h1>
+            <ul class="nav-list">
+                <li class="nav-list-item">about fragrance</li>
+                <li class="nav-list-item"><%= link_to "診断", perfumes_path, class: "link" %></li>
+            </ul>
+        </header>
+
+        <div class="start">
+            <h6>Are you ready?</h6>
+            <%= link_to "診断を始める", new_perfume_path, class: "link" %>
+        </div>
+    </body>
+
